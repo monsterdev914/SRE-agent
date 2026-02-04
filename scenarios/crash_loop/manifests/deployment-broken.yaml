@@ -1,0 +1,46 @@
+# Broken deployment: container exits because REQUIRED_CONFIG is not set.
+# This produces CrashLoopBackOff and is detectable via pod status, events, and logs.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sre-demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crash-demo
+  namespace: sre-demo
+  labels:
+    app: crash-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crash-demo
+  template:
+    metadata:
+      labels:
+        app: crash-demo
+    spec:
+      containers:
+        - name: app
+          image: busybox:1.36
+          # Exit 0 if REQUIRED_CONFIG is set, else exit 1 (causes CrashLoopBackOff)
+          command:
+            - /bin/sh
+            - -c
+            - |
+              if [ -z "$REQUIRED_CONFIG" ]; then
+                echo "FATAL: REQUIRED_CONFIG is not set"
+                exit 1
+              fi
+              echo "OK: REQUIRED_CONFIG=$REQUIRED_CONFIG"
+              sleep infinity
+          # Intentionally no env section — this is the "failure"
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
