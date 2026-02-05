@@ -1,3 +1,5 @@
+# OOM deployment: container is killed because it exceeds memory limit.
+# This produces OOMKilled and is detectable via pod status, events, and logs.
 apiVersion: v1
 kind: Namespace
 metadata:
