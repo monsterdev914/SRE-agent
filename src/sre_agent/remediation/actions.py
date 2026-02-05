@@ -55,8 +55,13 @@ def apply_remediation(
 
     try:
         if action.kind == RemediationKind.DELETE_POD and kind == "pod":
-            core.delete_namespaced_pod(name=name, namespace=namespace)
-            return True, f"Deleted pod {name}"
+            try:
+                core.delete_namespaced_pod(name=name, namespace=namespace)
+                return True, f"Deleted pod {name}"
+            except ApiException as e:
+                if e.status == 404:
+                    return True, f"Pod {name} already gone (not found); no action needed"
+                raise
 
         if action.kind == RemediationKind.PATCH_DEPLOYMENT_ENV and kind == "deployment":
             dep = apps.read_namespaced_deployment(name=name, namespace=namespace)
