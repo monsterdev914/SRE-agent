@@ -32,6 +32,8 @@ This scenario deploys an app that **exits immediately** unless a required enviro
 After testing, reset with:
 ```bash
 kubectl delete namespace sre-demo
-kubectl apply -f manifests/namespace.yaml
-kubectl apply -f manifests/deployment-broken.yaml
+kubectl apply -f manifests/crash_loop/deployment-broken.yaml
+kubectl apply -f manifests/crash_loop/deployment-fixed.yaml
+kubectl apply -f manifests/crash_loop/oom_deployment.yaml
+kubectl apply -f manifests/crash_loop/namespace.yaml
 ```
